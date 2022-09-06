@@ -1,7 +1,5 @@
 FROM ubuntu
 
-MAINTAINER Mattie
-
 RUN apt-get update
 RUN apt-get -y install lib32gcc1 libc6-i386 wget
 
@@ -27,4 +25,4 @@ ADD /scripts/ /opt/scripts/
 RUN chmod -R 774 /opt/scripts/
 
 #Server Start
-ENTRYPOINT ["/opt/scripts/start-server.sh"]
+ENTRYPOINT ["/home/container/start-server.sh"]
