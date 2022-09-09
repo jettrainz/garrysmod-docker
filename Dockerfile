@@ -1,28 +1,37 @@
-FROM ubuntu
+FROM ich777/debian-baseimage
 
-RUN apt-get update
-RUN apt-get -y install lib32gcc1 libc6-i386 wget
+LABEL org.opencontainers.image.authors="admin@minenet.at"
+LABEL org.opencontainers.image.source="https://github.com/ich777/docker-steamcmd-server"
 
-ENV DATA_DIR="/home/container/serverdata"
-ENV STEAMCMD_DIR="$/home/container/steamcmd"
-ENV SERVER_DIR="$/home/container/serverfiles"
+RUN apt-get update && \
+	apt-get -y install --no-install-recommends lib32gcc-s1 lib32stdc++6 lib32z1 && \
+	rm -rf /var/lib/apt/lists/*
+
+ENV DATA_DIR="/home/container"
+ENV STEAMCMD_DIR="/home/container/steamcmd"
+ENV SERVER_DIR="/home/container/serverfiles"
 ENV GAME_ID="4020"
 ENV GAME_NAME="garrysmod"
 ENV GAME_PARAMS="-secure +maxplayers 12 +map gm_flatgrass"
 ENV GAME_PORT=27015
+ENV VALIDATE=""
+ENV UMASK=000
+ENV UID=99
+ENV GID=101
+ENV USERNAME=""
+ENV PASSWRD=""
+ENV USER="steam"
+ENV DATA_PERM=777
 
-RUN mkdir $DATA_DIR
-RUN mkdir $STEAMCMD_DIR
-RUN mkdir $SERVER_DIR
+RUN mkdir $DATA_DIR && \
+	mkdir $STEAMCMD_DIR && \
+	mkdir $SERVER_DIR && \
+	useradd -d $DATA_DIR -s /bin/bash $USER && \
+	chown -R $USER $DATA_DIR && \
+	ulimit -n 2048
 
-# RUN wget -q -O ${STEAMCMD_DIR}/steamcmd_linux.tar.gz http://media.steampowered.com/client/steamcmd_linux.tar.gz \
-#  &&  tar --directory ${STEAMCMD_DIR} -xvzf ${STEAMCMD_DIR}/steamcmd_linux.tar.gz \
-#  &&  rm ${STEAMCMD_DIR}/steamcmd_linux.tar.gz \
-#  &&  chmod -R 774 $STEAMCMD_DIR  $SERVER_DIR 
-RUN ulimit -n 2048
-
-ADD /home/container/ /home/container/
-#RUN chmod -R 774 /opt/scripts/
+ADD /scripts/ /opt/scripts/
+RUN chmod -R 770 /opt/scripts/
 
 #Server Start
-ENTRYPOINT ["/home/container/start-server.sh"]
+ENTRYPOINT ["/opt/scripts/start.sh"]

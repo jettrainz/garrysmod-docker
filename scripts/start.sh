@@ -8,20 +8,20 @@ echo "---Setting umask to ${UMASK}---"
 umask ${UMASK}
 
 echo "---Checking for optional scripts---"
-cp -f /home/container/custom/user.sh /home/container/scripts/start-user.sh > /dev/null 2>&1 ||:
-cp -f /home/container/scripts/user.sh /home/container/scripts/start-user.sh > /dev/null 2>&1 ||:
+cp -f /opt/custom/user.sh /opt/scripts/start-user.sh > /dev/null 2>&1 ||:
+cp -f /opt/scripts/user.sh /opt/scripts/start-user.sh > /dev/null 2>&1 ||:
 
 if [ -f /opt/scripts/start-user.sh ]; then
     echo "---Found optional script, executing---"
-    chmod -f +x /home/container/scripts/start-user.sh.sh ||:
-    /home/container/scripts/start-user.sh || echo "---Optional Script has thrown an Error---"
+    chmod -f +x /opt/scripts/start-user.sh.sh ||:
+    /opt/scripts/start-user.sh || echo "---Optional Script has thrown an Error---"
 else
     echo "---No optional script found, continuing---"
 fi
 
 echo "---Taking ownership of data...---"
-chown -R root:${GID} /home/containers/scripts
-chmod -R 750 /home/containers/scripts
+chown -R root:${GID} /opt/scripts
+chmod -R 777 /opt/scripts
 chown -R ${UID}:${GID} ${DATA_DIR}
 
 echo "---Starting...---"
@@ -32,7 +32,7 @@ term_handler() {
 }
 
 trap 'kill ${!}; term_handler' SIGTERM
-su ${USER} -c "/home/container/scripts/start-server.sh" &
+su ${USER} -c "/opt/scripts/start-server.sh" &
 killpid="$!"
 while true
 do
